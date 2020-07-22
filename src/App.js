@@ -52,6 +52,7 @@ function App() {
         // },
     ]);
     const [isOpen, setIsOpen] = useState(false);
+    const [openSignIn, setOpenSignIn] = useState(false)
     const [username, setUsername] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -124,6 +125,7 @@ function App() {
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                         />
+
                         <Button type="submit" onClick={signUp}>
                             Sign-up
                         </Button>
@@ -138,7 +140,14 @@ function App() {
                 />
             </div>
 
-            <Button onClick={() => setIsOpen(true)}>Sign-up</Button>
+            {user ? (
+                <Button onClick={() => auth.signOut()}>Log out</Button>
+            ) : (
+                <div className="app__loginContainer">
+                    <Button onClick={() => setIsOpen(true)}>Sign-in</Button>
+                    <Button onClick={() => setIsOpen(true)}>Sign-up</Button>
+                </div>
+            )}
             {posts.map(({ post, id }) => (
                 <Post
                     key={id}
