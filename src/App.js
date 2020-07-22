@@ -52,7 +52,7 @@ function App() {
         // },
     ]);
     const [isOpen, setIsOpen] = useState(false);
-    const [openSignIn, setOpenSignIn] = useState(false)
+    const [isOpenSignIn, setIsOpenSignIn] = useState(false);
     const [username, setUsername] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -93,6 +93,18 @@ function App() {
                 });
             })
             .catch((error) => alert(error.message));
+
+        setIsOpen(false);
+    };
+
+    const signIn = (e) => {
+        e.preventDefault();
+
+        auth.signInWithEmailAndPassword(email, password).catch((err) =>
+            alert(err.message)
+        );
+
+        setIsOpenSignIn(false);
     };
 
     return (
@@ -132,6 +144,38 @@ function App() {
                     </form>
                 </div>
             </Modal>
+
+            <Modal open={isOpenSignIn} onClose={() => setIsOpenSignIn(false)}>
+                <div style={modalStyle} className={classes.paper}>
+                    <form className="app__signup">
+                        <center>
+                            <img
+                                className="app__headerImage"
+                                src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Instagram_logo.svg/1200px-Instagram_logo.svg.png"
+                                alt=""
+                            />
+                        </center>
+
+                        <Input
+                            placeholder="email"
+                            type="text"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                        />
+                        <Input
+                            placeholder="password"
+                            type="password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                        />
+
+                        <Button type="submit" onClick={signIn}>
+                            Sign-In
+                        </Button>
+                    </form>
+                </div>
+            </Modal>
+
             <div className="app__header">
                 <img
                     className="app__headerImage"
@@ -144,7 +188,9 @@ function App() {
                 <Button onClick={() => auth.signOut()}>Log out</Button>
             ) : (
                 <div className="app__loginContainer">
-                    <Button onClick={() => setIsOpen(true)}>Sign-in</Button>
+                    <Button onClick={() => setIsOpenSignIn(true)}>
+                        Sign-in
+                    </Button>
                     <Button onClick={() => setIsOpen(true)}>Sign-up</Button>
                 </div>
             )}
