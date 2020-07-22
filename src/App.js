@@ -6,6 +6,7 @@ import Modal from "@material-ui/core/Modal";
 import { makeStyles } from "@material-ui/core/styles";
 import { Button, Input } from "@material-ui/core";
 import ImageUpload from "./ImageUpload";
+import InstagramEmbed from "react-instagram-embed";
 
 function getModalStyle() {
     const top = 50;
@@ -77,11 +78,16 @@ function App() {
     }, [username, user]);
 
     useEffect(() => {
-        db.collection("posts").orderBy('timestamp', 'desc').onSnapshot((snapshot) => {
-            setPosts(
-                snapshot.docs.map((doc) => ({ post: doc.data(), id: doc.id }))
-            );
-        });
+        db.collection("posts")
+            .orderBy("timestamp", "desc")
+            .onSnapshot((snapshot) => {
+                setPosts(
+                    snapshot.docs.map((doc) => ({
+                        post: doc.data(),
+                        id: doc.id,
+                    }))
+                );
+            });
     }, []);
 
     const signUp = (e) => {
@@ -110,12 +116,6 @@ function App() {
 
     return (
         <div className="app">
-            {user?.displayName ? (
-                <ImageUpload username={user.displayName}/>
-            ):(
-                <h3>You need to login to upload</h3>
-            )}
-            
             <Modal open={isOpen} onClose={() => setIsOpen(false)}>
                 <div style={modalStyle} className={classes.paper}>
                     <form className="app__signup">
@@ -189,26 +189,52 @@ function App() {
                     src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Instagram_logo.svg/1200px-Instagram_logo.svg.png"
                     alt=""
                 />
+
+                {user ? (
+                    <Button onClick={() => auth.signOut()}>Log out</Button>
+                ) : (
+                    <div className="app__loginContainer">
+                        <Button onClick={() => setIsOpenSignIn(true)}>
+                            Sign-in
+                        </Button>
+                        <Button onClick={() => setIsOpen(true)}>Sign-up</Button>
+                    </div>
+                )}
+            </div>
+            <div className="app__posts">
+                <div className="app__postsleft">
+                    {posts.map(({ post, id }) => (
+                        <Post
+                            key={id}
+                            postId={id}
+                            user={user}
+                            username={post.username}
+                            caption={post.caption}
+                            imageUrl={post.imageUrl}
+                        />
+                    ))}
+                </div>
+                <div className="app__postsright">
+                    <InstagramEmbed
+                        url="https://www.instagram.com/p/CC8iKQCl5C2/"
+                        maxWidth={320}
+                        hideCaption={false}
+                        containerTagName="div"
+                        protocol=""
+                        injectScript
+                        onLoading={() => {}}
+                        onSuccess={() => {}}
+                        onAfterRender={() => {}}
+                        onFailure={() => {}}
+                    />
+                </div>
             </div>
 
-            {user ? (
-                <Button onClick={() => auth.signOut()}>Log out</Button>
+            {user?.displayName ? (
+                <ImageUpload username={user.displayName} />
             ) : (
-                <div className="app__loginContainer">
-                    <Button onClick={() => setIsOpenSignIn(true)}>
-                        Sign-in
-                    </Button>
-                    <Button onClick={() => setIsOpen(true)}>Sign-up</Button>
-                </div>
+                <h3>You need to login to upload</h3>
             )}
-            {posts.map(({ post, id }) => (
-                <Post
-                    key={id}
-                    username={post.username}
-                    caption={post.caption}
-                    imageUrl={post.imageUrl}
-                />
-            ))}
         </div>
     );
 }
